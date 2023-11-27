@@ -2,6 +2,7 @@ package handlerpacientes
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -118,6 +119,30 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 
 		web.Success(ctx, http.StatusOK, gin.H{
 			"data": pacienteUpdated,
+		})
+	}
+}
+
+func (c *Controlador) HandlerDelete() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		err = c.service.Delete(ctx, id)
+		if err != nil {
+			if errors.Is(err, pacientes.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "paciente con id", id, "no encontrado")
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H{
+			"message": fmt.Sprintf("paciente con id %d eliminado", id),
 		})
 	}
 }

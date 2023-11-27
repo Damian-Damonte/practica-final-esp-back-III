@@ -73,7 +73,12 @@ func (s *service) Update(ctx context.Context, id int, paciente domain.Paciente) 
 }
 
 func (s *service) Delete(ctx context.Context, id int) error {
-	panic("no implementado")
+	err := s.repository.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) Patch(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
