@@ -81,11 +81,32 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Paciente
 	return &paciente, nil
 }
 
-func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+func (r *repositorymysql) Create(ctx context.Context, paciente domain.Paciente) (*domain.Paciente, error) {
+	statement, err := r.db.Prepare(QuertyInsertPaciente)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(paciente.Apellido, paciente.Nombre, paciente.Domicilio, paciente.Dni, paciente.FechaAlta)
+
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	pacienteCreadte := paciente
+
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		return nil, ErrLastInsertedId
+	}
+
+	pacienteCreadte.Id = int(lastId)
+
+	return &pacienteCreadte, nil
 }
 
-func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.Paciente) (*domain.Paciente, error) {
+func (r *repositorymysql) Update(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
 	panic("no implementado")
 }
 
@@ -93,6 +114,6 @@ func (r *repositorymysql) Delete(ctx context.Context, id int) error {
 	panic("no implementado")
 }
 
-func (r *repositorymysql) Patch(ctx context.Context, id int, odontologo domain.Paciente) (*domain.Paciente, error) {
+func (r *repositorymysql) Patch(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
 	panic("no implementado")
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/pacientes"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/pkg/web"
 	"github.com/gin-gonic/gin"
@@ -54,6 +55,32 @@ func (c *Controlador) HandlerGetById() gin.HandlerFunc {
 		}
 
 		web.Success(ctx, http.StatusOK, gin.H {
+			"data": paciente,
+		})
+	}
+}
+
+func (c *Controlador) HandlerCreate() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var pacienteReq domain.Paciente
+
+		err := ctx.Bind(&pacienteReq)
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request")
+			return
+		}
+
+		paciente, err := c.service.Create(ctx, pacienteReq)
+		if err != nil {
+			if errors.Is(err, pacientes.ErrPacienteAttributes) {
+				web.Error(ctx, http.StatusBadRequest, "%s", err.Error())
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusCreated, gin.H{
 			"data": paciente,
 		})
 	}

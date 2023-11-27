@@ -3,11 +3,13 @@ package pacientes
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 
 var (
-	ErrPacienteUpdate = errors.New("atributos de paciente incorrectos")
+	ErrPacienteAttributes = errors.New("atributos de paciente incorrectos")
 )
 
 type service struct {
@@ -36,11 +38,22 @@ func (s *service) GetById(ctx context.Context, id int) (*domain.Paciente, error)
 	return paciente, nil
 }
 
-func (s *service) Create(ctx context.Context, odontologo domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+func (s *service) Create(ctx context.Context, paciente domain.Paciente) (*domain.Paciente, error) {
+	paciente.FechaAlta = time.Now()
+	err := s.validatePaciente(paciente)
+	if err != nil {
+		return nil, err
+	}
+
+	pacienteCreated, err := s.repository.Create(ctx, paciente)
+	if err != nil {
+		return nil, err
+	}
+
+	return pacienteCreated, nil
 }
 
-func (s *service) Update(ctx context.Context, id int, odontologo domain.Paciente) (*domain.Paciente, error) {
+func (s *service) Update(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
 	panic("no implementado")
 }
 
@@ -48,6 +61,16 @@ func (s *service) Delete(ctx context.Context, id int) error {
 	panic("no implementado")
 }
 
-func (s *service) Patch(ctx context.Context, id int, odontologo domain.Paciente) (*domain.Paciente, error) {
+func (s *service) Patch(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
 	panic("no implementado")
+}
+
+func (s *service) validatePaciente(paciente domain.Paciente) error {
+	if paciente.Apellido == "" || paciente.Nombre == "" || paciente.Domicilio == "" ||
+		paciente.Dni == 0 || paciente.FechaAlta.Equal(time.Time{}) {
+
+		return ErrPacienteAttributes
+	}
+
+	return nil
 }

@@ -3,11 +3,12 @@ package odontologos
 import (
 	"context"
 	"errors"
+
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 
 var (
-	ErrOdontologoUpdate = errors.New("atributos de odontologo incorrectos")
+	ErrOdontologoAttributes = errors.New("atributos de odontologo incorrectos")
 )
 
 type service struct {
@@ -37,6 +38,11 @@ func (s *service) GetById(ctx context.Context, id int) (*domain.Odontologo, erro
 }
 
 func (s *service) Create(ctx context.Context, odontologo domain.Odontologo) (*domain.Odontologo, error) {
+	err := s.validateOdontologo(odontologo)
+	if err != nil {
+		return nil, err
+	}
+
 	odontologoCreated, err := s.repository.Create(ctx, odontologo)
 	if err != nil {
 		return nil, err
@@ -51,7 +57,7 @@ func (s *service) Update(ctx context.Context, id int, odontologo domain.Odontolo
 		return nil, err
 	}
 
-	err = s.validatePut(odontologo)
+	err = s.validateOdontologo(odontologo)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +98,9 @@ func (s *service) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (s *service) validatePut(odontologoUpdate domain.Odontologo) error {
-	if (odontologoUpdate.Apellido == "" || odontologoUpdate.Nombre == "" || odontologoUpdate.Matricula == "") {
-		return ErrOdontologoUpdate
+func (s *service) validateOdontologo(odontologoUpdate domain.Odontologo) error {
+	if odontologoUpdate.Apellido == "" || odontologoUpdate.Nombre == "" || odontologoUpdate.Matricula == "" {
+		return ErrOdontologoAttributes
 	}
 
 	return nil

@@ -31,7 +31,7 @@ func (c *Controlador) HandlerGetAll() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H {
+		web.Success(ctx, http.StatusOK, gin.H{
 			"data": odontologos,
 		})
 	}
@@ -55,7 +55,7 @@ func (c *Controlador) HandlerGetById() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H {
+		web.Success(ctx, http.StatusOK, gin.H{
 			"data": odontologo,
 		})
 	}
@@ -73,11 +73,15 @@ func (c *Controlador) HandlerCreate() gin.HandlerFunc {
 
 		odontologo, err := c.service.Create(ctx, odontologoReq)
 		if err != nil {
+			if errors.Is(err, odontologos.ErrOdontologoAttributes) {
+				web.Error(ctx, http.StatusBadRequest, "%s", err.Error())
+				return
+			}
 			web.InternalServerError(ctx)
 			return
 		}
 
-		web.Success(ctx, http.StatusCreated, gin.H {
+		web.Success(ctx, http.StatusCreated, gin.H{
 			"data": odontologo,
 		})
 	}
@@ -101,19 +105,19 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 
 		odontologoUpdated, err := c.service.Update(ctx, id, odontologoReq)
 		if err != nil {
-			if errors.Is(err, odontologos.ErrNotFound) {
-				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
+			if errors.Is(err, odontologos.ErrOdontologoAttributes) {
+				web.Error(ctx, http.StatusBadRequest, "%s", err.Error())
 				return
 			}
-			if errors.Is(err, odontologos.ErrOdontologoUpdate) {
-				web.Error(ctx, http.StatusBadRequest, "%s", err.Error())
+			if errors.Is(err, odontologos.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
 				return
 			}
 			web.InternalServerError(ctx)
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H {
+		web.Success(ctx, http.StatusOK, gin.H{
 			"data": odontologoUpdated,
 		})
 	}
@@ -169,7 +173,7 @@ func (c *Controlador) HandlerPatch() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H {
+		web.Success(ctx, http.StatusOK, gin.H{
 			"data": odontologoPatched,
 		})
 	}
