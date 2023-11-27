@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("not found")
+	ErrNotFound         = errors.New("not found")
 	ErrPrepareStatement = errors.New("error prepare statement")
 	ErrExecStatement    = errors.New("error exec statement")
 	ErrLastInsertedId   = errors.New("error last inserted id")
@@ -86,7 +86,7 @@ func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Odontolo
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre,	odontologo.Matricula,)
+	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre, odontologo.Matricula)
 
 	if err != nil {
 		return nil, ErrExecStatement
@@ -111,7 +111,7 @@ func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre,	odontologo.Matricula,	id,)
+	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre, odontologo.Matricula, id)
 	if err != nil {
 		return nil, ErrExecStatement
 	}
@@ -128,7 +128,21 @@ func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.
 }
 
 func (r *repositorymysql) Delete(ctx context.Context, id int) error {
-	panic("no implementado")
+	result, err := r.db.Exec(QueryDeleteOdontologo, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected < 1 {
+		return ErrNotFound
+	}
+
+	return nil
 }
 
 func (r *repositorymysql) Patch(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {

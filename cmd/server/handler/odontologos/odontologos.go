@@ -115,3 +115,27 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 		})
 	}
 }
+
+func (c *Controlador) HandlerDelete() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		err = c.service.Delete(ctx, id)
+		if err != nil {
+			if errors.Is(err, odontologos.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H{
+			"message": fmt.Sprintf("odontologo con id %d eliminado", id),
+		})
+	}
+}
