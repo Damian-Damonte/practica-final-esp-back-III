@@ -82,7 +82,7 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Paciente
 }
 
 func (r *repositorymysql) Create(ctx context.Context, paciente domain.Paciente) (*domain.Paciente, error) {
-	statement, err := r.db.Prepare(QuertyInsertPaciente)
+	statement, err := r.db.Prepare(QueryInsertPaciente)
 	if err != nil {
 		return nil, ErrPrepareStatement
 	}
@@ -107,7 +107,26 @@ func (r *repositorymysql) Create(ctx context.Context, paciente domain.Paciente) 
 }
 
 func (r *repositorymysql) Update(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+	statement, err := r.db.Prepare(QueryUpdatePaciente)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(paciente.Apellido, paciente.Nombre, paciente.Domicilio, paciente.Dni, paciente.FechaAlta, id)
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	pacienteUpdated := paciente
+	pacienteUpdated.Id = id
+
+	return &pacienteUpdated, nil
 }
 
 func (r *repositorymysql) Delete(ctx context.Context, id int) error {

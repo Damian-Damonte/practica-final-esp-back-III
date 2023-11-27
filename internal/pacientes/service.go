@@ -54,7 +54,22 @@ func (s *service) Create(ctx context.Context, paciente domain.Paciente) (*domain
 }
 
 func (s *service) Update(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+	_, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.validatePaciente(paciente)
+	if err != nil {
+		return nil, err
+	}
+
+	pacienteUpdated, err := s.repository.Update(ctx, id, paciente)
+	if err != nil {
+		return nil, err
+	}
+
+	return pacienteUpdated, nil
 }
 
 func (s *service) Delete(ctx context.Context, id int) error {

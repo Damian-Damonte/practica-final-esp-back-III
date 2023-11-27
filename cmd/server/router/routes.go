@@ -21,10 +21,10 @@ type router struct {
 	db          *sql.DB
 }
 
-func NewRouter(engine *gin.Engine, db *sql.DB) Router{
+func NewRouter(engine *gin.Engine, db *sql.DB) Router {
 	return &router{
 		engine: engine,
-		db: db,
+		db:     db,
 	}
 }
 
@@ -63,17 +63,15 @@ func (r *router) buildOdontologoRoutes() {
 func (r *router) buildPacientesRoutes() {
 	repository := pacientes.NewMySqlRepository(r.db)
 	service := pacientes.NewServiceOdontologo(repository)
-	controlador := handlerpacientes.NewControladorOdontologo(service)
+	controlador := handlerpacientes.NewControladorPaciente(service)
 
 	grupoOdontologos := r.routerGroup.Group("/pacientes")
 	{
 		grupoOdontologos.GET("", controlador.HandlerGetAll())
 		grupoOdontologos.GET(":id", controlador.HandlerGetById())
 		grupoOdontologos.POST("", controlador.HandlerCreate())
-		// grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
+		grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
 		// grupoOdontologos.DELETE(":id", controlador.HandlerDelete())
 		// grupoOdontologos.PATCH(":id", controlador.HandlerPatch())
 	}
 }
-
-
