@@ -11,6 +11,9 @@ import (
 
 var (
 	ErrNotFound = errors.New("not found")
+	ErrPrepareStatement = errors.New("error prepare statement")
+	ErrExecStatement    = errors.New("error exec statement")
+	ErrLastInsertedId   = errors.New("error last inserted id")
 )
 
 type repositorymysql struct {
@@ -77,7 +80,28 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Odontolo
 }
 
 func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Odontologo) (*domain.Odontologo, error) {
-	panic("no implementado")
+	statement, err := r.db.Prepare(QuertyInsertOdontologo)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre,	odontologo.Matricula,)
+
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	odontologoCreated := odontologo
+
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		return nil, ErrLastInsertedId
+	}
+
+	odontologoCreated.Id = int(lastId)
+
+	return &odontologoCreated, nil
 }
 
 func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {

@@ -36,6 +36,11 @@ func (r *router) setGroup() {
 	r.routerGroup = r.engine.Group("/api/v1")
 }
 
+func (r *router) buildPingRoutes() {
+	pingController := ping.NewControllerPing()
+	r.routerGroup.GET("/ping", pingController.HandlerPing())
+}
+
 func (r *router) buildOdontologoRoutes() {
 	repository := odontologos.NewMySqlRepository(r.db)
 	service := odontologos.NewServiceOdontologo(repository)
@@ -45,11 +50,9 @@ func (r *router) buildOdontologoRoutes() {
 	{
 		grupoOdontologos.GET("", controlador.HandlerGetAll())
 		grupoOdontologos.GET(":id", controlador.HandlerGetById())
+		grupoOdontologos.POST("", controlador.HandlerCreate())
 	}
 }
 
-func (r *router) buildPingRoutes() {
-	pingController := ping.NewControllerPing()
-	r.routerGroup.GET("/ping", pingController.HandlerPing())
-}
+
 

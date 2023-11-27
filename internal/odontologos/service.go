@@ -32,7 +32,12 @@ func (s *service) GetById(ctx context.Context, id int) (*domain.Odontologo, erro
 }
 
 func (s *service) Create(ctx context.Context, odontologo domain.Odontologo) (*domain.Odontologo, error) {
-	panic("no implementado")
+	odontologoCreated, err := s.repository.Create(ctx, odontologo)
+	if err != nil {
+		return nil, err
+	}
+
+	return odontologoCreated, nil
 }
 
 func (s *service) Update(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
