@@ -2,7 +2,6 @@ package odontologos
 
 import (
 	"context"
-
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 
@@ -24,7 +23,12 @@ func (s *service) GetAll(ctx context.Context) (*[]domain.Odontologo, error) {
 }
 
 func (s *service) GetById(ctx context.Context, id int) (*domain.Odontologo, error) {
-	panic("no implementado")
+	odontologo, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return odontologo, nil
 }
 
 func (s *service) Create(ctx context.Context, odontologo domain.Odontologo) (*domain.Odontologo, error) {

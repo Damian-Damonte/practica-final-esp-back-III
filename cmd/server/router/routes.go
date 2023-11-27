@@ -44,6 +44,7 @@ func (r *router) buildOdontologoRoutes() {
 	grupoOdontologos := r.routerGroup.Group("/odontologos")
 	{
 		grupoOdontologos.GET("", controlador.HandlerGetAll())
+		grupoOdontologos.GET(":id", controlador.HandlerGetById())
 	}
 }
 

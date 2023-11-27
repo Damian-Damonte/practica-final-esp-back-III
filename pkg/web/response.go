@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type response struct {
-	Data interface{} `json:"data"`
-}
+// type response struct {
+// 	Data interface{} `json:"data"`
+// }
 
 type errorResponse struct {
-	Status  int    `json:"-"`
+	Status  int    `json:"status"`
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
@@ -22,8 +22,8 @@ func Response(c *gin.Context, status int, data any) {
 	c.JSON(status, data)
 }
 
-func Success(c *gin.Context, status int, data any) {
-	Response(c, status, response{Data: data})
+func Success(c *gin.Context, status int, body any) {
+	Response(c, status, body)
 }
 
 // NewErrorf creates a new error with the given status code and the message
@@ -36,4 +36,8 @@ func Error(c *gin.Context, status int, format string, args ...any) {
 	}
 
 	Response(c, status, err)
+}
+
+func InternalServerError(ctx *gin.Context) {
+	Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 }

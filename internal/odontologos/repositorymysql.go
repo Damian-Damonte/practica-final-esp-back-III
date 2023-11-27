@@ -3,8 +3,14 @@ package odontologos
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
+)
+
+var (
+	ErrNotFound = errors.New("not found")
 )
 
 type repositorymysql struct {
@@ -49,7 +55,25 @@ func (r *repositorymysql) GetAll(ctx context.Context) (*[]domain.Odontologo, err
 }
 
 func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Odontologo, error) {
-	panic("no implementado")
+	row := r.db.QueryRow(QueryGetOdontologoById, id)
+
+	var odontologo domain.Odontologo
+	err := row.Scan(
+		&odontologo.Id,
+		&odontologo.Apellido,
+		&odontologo.Nombre,
+		&odontologo.Matricula,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		fmt.Println("error en repository GetById", err.Error())
+		return nil, err
+	}
+
+	return &odontologo, nil
 }
 
 func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Odontologo) (*domain.Odontologo, error) {

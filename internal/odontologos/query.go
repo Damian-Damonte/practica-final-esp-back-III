@@ -1,5 +1,6 @@
 package odontologos
 
 var (
-	QueryGetAllOdontologos = `SELECT * FROM odontologos`
+	QueryGetAllOdontologos = `SELECT id, apellido, nombre, matricula FROM odontologos`
+	QueryGetOdontologoById = `SELECT id, apellido, nombre, matricula FROM odontologos WHERE id = ?`
 )
