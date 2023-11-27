@@ -68,7 +68,7 @@ func (r *router) buildPacientesRoutes() {
 	grupoOdontologos := r.routerGroup.Group("/pacientes")
 	{
 		grupoOdontologos.GET("", controlador.HandlerGetAll())
-		// grupoOdontologos.GET(":id", controlador.HandlerGetById())
+		grupoOdontologos.GET(":id", controlador.HandlerGetById())
 		// grupoOdontologos.POST("", controlador.HandlerCreate())
 		// grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
 		// grupoOdontologos.DELETE(":id", controlador.HandlerDelete())

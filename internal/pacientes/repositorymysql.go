@@ -59,7 +59,26 @@ func (r *repositorymysql) GetAll(ctx context.Context) (*[]domain.Paciente, error
 }
 
 func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Paciente, error) {
-	panic("no implementado")
+	row := r.db.QueryRow(QueryGetPacientesById, id)
+
+	var paciente domain.Paciente
+	err := row.Scan(
+		&paciente.Id,
+		&paciente.Apellido,
+		&paciente.Nombre,
+		&paciente.Domicilio,
+		&paciente.Dni,
+		&paciente.FechaAlta,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+
+	return &paciente, nil
 }
 
 func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Paciente) (*domain.Paciente, error) {

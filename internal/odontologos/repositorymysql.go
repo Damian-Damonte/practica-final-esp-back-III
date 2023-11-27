@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
-
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 
@@ -72,7 +70,6 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Odontolo
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
-		fmt.Println("error en repository GetById", err.Error())
 		return nil, err
 	}
 

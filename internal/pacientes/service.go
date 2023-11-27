@@ -28,7 +28,12 @@ func (s *service) GetAll(ctx context.Context) (*[]domain.Paciente, error) {
 }
 
 func (s *service) GetById(ctx context.Context, id int) (*domain.Paciente, error) {
-	panic("no implementado")
+	paciente, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return paciente, nil
 }
 
 func (s *service) Create(ctx context.Context, odontologo domain.Paciente) (*domain.Paciente, error) {
