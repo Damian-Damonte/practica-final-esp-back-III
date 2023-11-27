@@ -2,7 +2,13 @@ package odontologos
 
 import (
 	"context"
+	"errors"
+
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
+)
+
+var (
+	ErrOdontologoUpdate = errors.New("atributos de odontologo incorrectos")
 )
 
 type service struct {
@@ -46,12 +52,36 @@ func (s *service) Update(ctx context.Context, id int, odontologo domain.Odontolo
 		return nil, err
 	}
 
+	err = s.validatePut(odontologo)
+	if err != nil {
+		return nil, err
+	}
+
 	odontologoUpdated, err := s.repository.Update(ctx, id, odontologo)
 	if err != nil {
 		return nil, err
 	}
 
 	return odontologoUpdated, nil
+}
+
+func (s *service) Patch(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
+	odontologoSaved, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	odontologoPatch, err := s.validatePatch(*odontologoSaved, odontologo)
+	if err != nil {
+		return nil, err
+	}
+
+	odotologoPatched, err := s.repository.Patch(ctx, id, odontologoPatch)
+	if err != nil {
+		return nil, err
+	}
+
+	return odotologoPatched, nil
 }
 
 func (s *service) Delete(ctx context.Context, id int) error {
@@ -63,6 +93,24 @@ func (s *service) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (s *service) Patch(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
-	panic("no implementado")
+func (s *service) validatePut(odontologoUpdate domain.Odontologo) error {
+	if (odontologoUpdate.Apellido == "" || odontologoUpdate.Nombre == "" || odontologoUpdate.Matricula == "") {
+		return ErrOdontologoUpdate
+	}
+
+	return nil
+}
+
+func (s *service) validatePatch(odontologoSaved, odontologoPatch domain.Odontologo) (domain.Odontologo, error) {
+	if odontologoPatch.Apellido != "" {
+		odontologoSaved.Apellido = odontologoPatch.Apellido
+	}
+	if odontologoPatch.Nombre != "" {
+		odontologoSaved.Nombre = odontologoPatch.Nombre
+	}
+	if odontologoPatch.Matricula != "" {
+		odontologoSaved.Matricula = odontologoPatch.Matricula
+	}
+
+	return odontologoSaved, nil
 }

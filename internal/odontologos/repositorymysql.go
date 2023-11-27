@@ -127,6 +127,29 @@ func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.
 	return &odontologoUpdated, nil
 }
 
+func (r *repositorymysql) Patch(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
+	statement, err := r.db.Prepare(QueryUpdateOdontologo)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre, odontologo.Matricula, id)
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	odontologoUpdated := odontologo
+	odontologoUpdated.Id = id
+
+	return &odontologoUpdated, nil
+}
+
 func (r *repositorymysql) Delete(ctx context.Context, id int) error {
 	result, err := r.db.Exec(QueryDeleteOdontologo, id)
 	if err != nil {
@@ -143,8 +166,4 @@ func (r *repositorymysql) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
-}
-
-func (r *repositorymysql) Patch(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
-	panic("no implementado")
 }

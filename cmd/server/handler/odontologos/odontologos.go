@@ -95,7 +95,6 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 
 		err = ctx.Bind(&odontologoReq)
 		if err != nil {
-			fmt.Println(err.Error())
 			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
 			return
 		}
@@ -104,6 +103,10 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, odontologos.ErrNotFound) {
 				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
+				return
+			}
+			if errors.Is(err, odontologos.ErrOdontologoUpdate) {
+				web.Error(ctx, http.StatusBadRequest, "%s", err.Error())
 				return
 			}
 			web.InternalServerError(ctx)
@@ -136,6 +139,38 @@ func (c *Controlador) HandlerDelete() gin.HandlerFunc {
 
 		web.Success(ctx, http.StatusOK, gin.H{
 			"message": fmt.Sprintf("odontologo con id %d eliminado", id),
+		})
+	}
+}
+
+func (c *Controlador) HandlerPatch() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		var odontologoReq domain.Odontologo
+
+		err = ctx.Bind(&odontologoReq)
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
+			return
+		}
+
+		odontologoPatched, err := c.service.Patch(ctx, id, odontologoReq)
+		if err != nil {
+			if errors.Is(err, odontologos.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H {
+			"data": odontologoPatched,
 		})
 	}
 }

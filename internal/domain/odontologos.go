@@ -2,7 +2,7 @@ package domain
 
 type Odontologo struct {
 	Id        int    `json:"id"`
-	Apellido  string `json:"apellido" binding:"required"`
-	Nombre    string `json:"nombre" binding:"required"`
-	Matricula string `json:"matricula" binding:"required"`
+	Apellido  string `json:"apellido"`
+	Nombre    string `json:"nombre"`
+	Matricula string `json:"matricula"`
 }
