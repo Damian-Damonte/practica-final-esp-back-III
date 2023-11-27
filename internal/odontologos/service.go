@@ -3,7 +3,6 @@ package odontologos
 import (
 	"context"
 	"errors"
-
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 

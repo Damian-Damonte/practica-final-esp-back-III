@@ -4,8 +4,10 @@ import (
 	"database/sql"
 
 	handlerodontologos "github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/odontologos"
+	handlerpacientes "github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/pacientes"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/ping"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/odontologos"
+	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/pacientes"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,6 +32,7 @@ func (r *router) MapRoutes() {
 	r.setGroup()
 	r.buildPingRoutes()
 	r.buildOdontologoRoutes()
+	r.buildPacientesRoutes()
 }
 
 func (r *router) setGroup() {
@@ -57,5 +60,20 @@ func (r *router) buildOdontologoRoutes() {
 	}
 }
 
+func (r *router) buildPacientesRoutes() {
+	repository := pacientes.NewMySqlRepository(r.db)
+	service := pacientes.NewServiceOdontologo(repository)
+	controlador := handlerpacientes.NewControladorOdontologo(service)
+
+	grupoOdontologos := r.routerGroup.Group("/pacientes")
+	{
+		grupoOdontologos.GET("", controlador.HandlerGetAll())
+		// grupoOdontologos.GET(":id", controlador.HandlerGetById())
+		// grupoOdontologos.POST("", controlador.HandlerCreate())
+		// grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
+		// grupoOdontologos.DELETE(":id", controlador.HandlerDelete())
+		// grupoOdontologos.PATCH(":id", controlador.HandlerPatch())
+	}
+}
 
 
