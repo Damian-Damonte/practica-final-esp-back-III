@@ -2,6 +2,7 @@ package handlerodontologos
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -78,6 +79,39 @@ func (c *Controlador) HandlerCreate() gin.HandlerFunc {
 
 		web.Success(ctx, http.StatusCreated, gin.H {
 			"data": odontologo,
+		})
+	}
+}
+
+func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		var odontologoReq domain.Odontologo
+
+		err = ctx.Bind(&odontologoReq)
+		if err != nil {
+			fmt.Println(err.Error())
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
+			return
+		}
+
+		odontologoUpdated, err := c.service.Update(ctx, id, odontologoReq)
+		if err != nil {
+			if errors.Is(err, odontologos.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "odontologo con id", id, "no encontrado")
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H {
+			"data": odontologoUpdated,
 		})
 	}
 }

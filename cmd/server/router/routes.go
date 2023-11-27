@@ -51,6 +51,7 @@ func (r *router) buildOdontologoRoutes() {
 		grupoOdontologos.GET("", controlador.HandlerGetAll())
 		grupoOdontologos.GET(":id", controlador.HandlerGetById())
 		grupoOdontologos.POST("", controlador.HandlerCreate())
+		grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
 	}
 }
 

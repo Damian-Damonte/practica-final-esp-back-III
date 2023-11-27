@@ -105,7 +105,26 @@ func (r *repositorymysql) Create(ctx context.Context, odontologo domain.Odontolo
 }
 
 func (r *repositorymysql) Update(ctx context.Context, id int, odontologo domain.Odontologo) (*domain.Odontologo, error) {
-	panic("no implementado")
+	statement, err := r.db.Prepare(QueryUpdateOdontologo)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(odontologo.Apellido, odontologo.Nombre,	odontologo.Matricula,	id,)
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	odontologoUpdated := odontologo
+	odontologoUpdated.Id = id
+
+	return &odontologoUpdated, nil
 }
 
 func (r *repositorymysql) Delete(ctx context.Context, id int) error {
