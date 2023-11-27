@@ -16,7 +16,7 @@ type service struct {
 	repository Repository
 }
 
-func NewServiceOdontologo(repository Repository) Service {
+func NewServicePaciente(repository Repository) Service {
 	return &service{repository: repository}
 }
 
@@ -82,7 +82,22 @@ func (s *service) Delete(ctx context.Context, id int) error {
 }
 
 func (s *service) Patch(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+	pacienteSaved, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	pacientePatch, err := s.validatePacientePatch(*pacienteSaved, paciente)
+	if err != nil {
+		return nil, err
+	}
+
+	pacientePatched, err := s.repository.Patch(ctx, id, pacientePatch)
+	if err != nil {
+		return nil, err
+	}
+
+	return pacientePatched, nil
 }
 
 func (s *service) validatePaciente(paciente domain.Paciente) error {
@@ -93,4 +108,24 @@ func (s *service) validatePaciente(paciente domain.Paciente) error {
 	}
 
 	return nil
+}
+
+func (s *service) validatePacientePatch(pacienteSaved, pacientePatch domain.Paciente) (domain.Paciente, error) {
+	if pacientePatch.Apellido != "" {
+		pacienteSaved.Apellido = pacientePatch.Apellido
+	}
+	if pacientePatch.Nombre != "" {
+		pacienteSaved.Nombre = pacientePatch.Nombre
+	}
+	if pacientePatch.Domicilio != "" {
+		pacienteSaved.Domicilio = pacientePatch.Domicilio
+	}
+	if pacientePatch.Dni != 0 {
+		pacienteSaved.Dni = pacientePatch.Dni
+	}
+	if !pacientePatch.FechaAlta.Equal(time.Time{}) {
+		pacienteSaved.FechaAlta = pacientePatch.FechaAlta
+	}
+
+	return pacienteSaved, nil
 }

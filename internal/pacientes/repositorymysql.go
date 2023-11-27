@@ -148,5 +148,24 @@ func (r *repositorymysql) Delete(ctx context.Context, id int) error {
 }
 
 func (r *repositorymysql) Patch(ctx context.Context, id int, paciente domain.Paciente) (*domain.Paciente, error) {
-	panic("no implementado")
+	statement, err := r.db.Prepare(QueryUpdatePaciente)
+	if err != nil {
+		return nil, ErrPrepareStatement
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(paciente.Apellido, paciente.Nombre, paciente.Domicilio, paciente.Dni, paciente.FechaAlta, id)
+	if err != nil {
+		return nil, ErrExecStatement
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	pacienteUpdated := paciente
+	pacienteUpdated.Id = id
+
+	return &pacienteUpdated, nil
 }

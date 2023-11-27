@@ -62,7 +62,7 @@ func (r *router) buildOdontologoRoutes() {
 
 func (r *router) buildPacientesRoutes() {
 	repository := pacientes.NewMySqlRepository(r.db)
-	service := pacientes.NewServiceOdontologo(repository)
+	service := pacientes.NewServicePaciente(repository)
 	controlador := handlerpacientes.NewControladorPaciente(service)
 
 	grupoOdontologos := r.routerGroup.Group("/pacientes")
@@ -72,6 +72,6 @@ func (r *router) buildPacientesRoutes() {
 		grupoOdontologos.POST("", controlador.HandlerCreate())
 		grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
 		grupoOdontologos.DELETE(":id", controlador.HandlerDelete())
-		// grupoOdontologos.PATCH(":id", controlador.HandlerPatch())
+		grupoOdontologos.PATCH(":id", controlador.HandlerPatch())
 	}
 }

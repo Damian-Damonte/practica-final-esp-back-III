@@ -146,3 +146,35 @@ func (c *Controlador) HandlerDelete() gin.HandlerFunc {
 		})
 	}
 }
+
+func (c *Controlador) HandlerPatch() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		var pacienteReq domain.Paciente
+
+		err = ctx.Bind(&pacienteReq)
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
+			return
+		}
+
+		pacientePatched, err := c.service.Patch(ctx, id, pacienteReq)
+		if err != nil {
+			if errors.Is(err, pacientes.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d %s", "paciente con id", id, "no encontrado")
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": pacientePatched,
+		})
+	}
+}
