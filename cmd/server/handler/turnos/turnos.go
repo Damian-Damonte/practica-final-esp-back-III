@@ -58,3 +58,27 @@ func (c *Controlador) HandlerGetById() gin.HandlerFunc {
 		})
 	}
 }
+
+func (c *Controlador) HandlerGetPacienteDni() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		dni, err := strconv.Atoi(ctx.Query("dni"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "dni invalido")
+			return
+		}
+
+		turnosPaciente, err := c.service.GetByPacienteDni(ctx, dni)
+		if err != nil {
+			if errors.Is(err, turnos.ErrNotFound) {
+				web.Error(ctx, http.StatusNotFound, "%s %d", "no se encontraron turnos para el paciente con dni ", dni)
+				return
+			}
+			web.InternalServerError(ctx)
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": turnosPaciente,
+		})
+	}
+}

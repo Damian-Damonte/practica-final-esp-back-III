@@ -3,8 +3,6 @@ package turnos
 import (
 	"context"
 	"errors"
-	"fmt"
-
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/domain"
 )
 
@@ -23,7 +21,6 @@ func NewServiceTurno(repository Repository) Service {
 func (s *service) GetAll(ctx context.Context) (*[]domain.Turno, error) {
 	listTurnos, err := s.repository.GetAll(ctx)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -39,3 +36,11 @@ func (s *service) GetById(ctx context.Context, id int) (*domain.Turno, error) {
 	return paciente, nil
 }
 
+func (s *service) GetByPacienteDni(ctx context.Context, dni int) (*[]domain.Turno, error) {
+	listTurnos, err := s.repository.GetByPacienteDni(ctx, dni)
+	if err != nil {
+		return nil, err
+	}
+
+	return listTurnos, nil
+}

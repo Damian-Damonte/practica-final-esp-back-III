@@ -88,5 +88,6 @@ func (r *router) buildTurnosRoutes() {
 	{
 		grupoTurnos.GET("", controlador.HandlerGetAll())
 		grupoTurnos.GET(":id", controlador.HandlerGetById())
+		grupoTurnos.GET("/search", controlador.HandlerGetPacienteDni())
 	}
 }

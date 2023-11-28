@@ -71,6 +71,44 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Turno, e
 	var turno domain.Turno
 	err := row.Scan(
 		&turno.Id,
+		&turno.Descripcion,
+		&turno.FechaHora,
+		&turno.Odontologo.Id,
+		&turno.Odontologo.Apellido,
+		&turno.Odontologo.Nombre,
+		&turno.Odontologo.Matricula,
+		&turno.Paciente.Id,
+		&turno.Paciente.Apellido,
+		&turno.Paciente.Nombre,
+		&turno.Paciente.Domicilio,
+		&turno.Paciente.Dni,
+		&turno.Paciente.FechaAlta,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+
+	return &turno, nil
+}
+
+func (r *repositorymysql) GetByPacienteDni(ctx context.Context, dni int) (*[]domain.Turno, error) {
+	rows, err := r.db.Query(QueryGetTurnoByPacienteDni, dni)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var turnos []domain.Turno
+
+	for rows.Next() {
+		var turno domain.Turno
+		err := rows.Scan(
+			&turno.Id,
 			&turno.Descripcion,
 			&turno.FechaHora,
 			&turno.Odontologo.Id,
@@ -83,14 +121,22 @@ func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Turno, e
 			&turno.Paciente.Domicilio,
 			&turno.Paciente.Dni,
 			&turno.Paciente.FechaAlta,
-	)
+		)
 
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
+		if err != nil {
+			return nil, err
 		}
+
+		turnos = append(turnos, turno)
+	}
+
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return &turno, nil
+	if len(turnos) == 0 {
+		return nil, ErrNotFound
+	}
+
+	return &turnos, nil
 }
