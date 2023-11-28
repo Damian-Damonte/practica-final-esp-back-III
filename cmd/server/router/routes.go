@@ -6,8 +6,10 @@ import (
 	handlerodontologos "github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/odontologos"
 	handlerpacientes "github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/pacientes"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/ping"
+	handlerturnos "github.com/Damian-Damonte/practica-final-esp-back-III/cmd/server/handler/turnos"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/odontologos"
 	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/pacientes"
+	"github.com/Damian-Damonte/practica-final-esp-back-III/internal/turnos"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,6 +35,7 @@ func (r *router) MapRoutes() {
 	r.buildPingRoutes()
 	r.buildOdontologoRoutes()
 	r.buildPacientesRoutes()
+	r.buildTurnosRoutes()
 }
 
 func (r *router) setGroup() {
@@ -73,5 +76,16 @@ func (r *router) buildPacientesRoutes() {
 		grupoOdontologos.PUT(":id", controlador.HandlerUpdate())
 		grupoOdontologos.DELETE(":id", controlador.HandlerDelete())
 		grupoOdontologos.PATCH(":id", controlador.HandlerPatch())
+	}
+}
+
+func (r *router) buildTurnosRoutes() {
+	repository := turnos.NewMySqlRepository(r.db)
+	service := turnos.NewServiceTurno(repository)
+	controlador := handlerturnos.NewControladorOdontologo(service)
+
+	grupoTurnos := r.routerGroup.Group("/turnos")
+	{
+		grupoTurnos.GET("", controlador.HandlerGetAll())
 	}
 }
