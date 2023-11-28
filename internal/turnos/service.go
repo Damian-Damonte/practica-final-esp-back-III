@@ -29,3 +29,13 @@ func (s *service) GetAll(ctx context.Context) (*[]domain.Turno, error) {
 
 	return listTurnos, nil
 }
+
+func (s *service) GetById(ctx context.Context, id int) (*domain.Turno, error) {
+	paciente, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return paciente, nil
+}
+

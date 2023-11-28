@@ -65,3 +65,32 @@ func (r *repositorymysql) GetAll(ctx context.Context) (*[]domain.Turno, error) {
 	return &turnos, nil
 }
 
+func (r *repositorymysql) GetById(ctx context.Context, id int) (*domain.Turno, error) {
+	row := r.db.QueryRow(QueryGetTurnoById, id)
+
+	var turno domain.Turno
+	err := row.Scan(
+		&turno.Id,
+			&turno.Descripcion,
+			&turno.FechaHora,
+			&turno.Odontologo.Id,
+			&turno.Odontologo.Apellido,
+			&turno.Odontologo.Nombre,
+			&turno.Odontologo.Matricula,
+			&turno.Paciente.Id,
+			&turno.Paciente.Apellido,
+			&turno.Paciente.Nombre,
+			&turno.Paciente.Domicilio,
+			&turno.Paciente.Dni,
+			&turno.Paciente.FechaAlta,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+
+	return &turno, nil
+}

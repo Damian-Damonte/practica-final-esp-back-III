@@ -87,5 +87,6 @@ func (r *router) buildTurnosRoutes() {
 	grupoTurnos := r.routerGroup.Group("/turnos")
 	{
 		grupoTurnos.GET("", controlador.HandlerGetAll())
+		grupoTurnos.GET(":id", controlador.HandlerGetById())
 	}
 }
